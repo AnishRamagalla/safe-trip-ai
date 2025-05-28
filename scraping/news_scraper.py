@@ -13,8 +13,8 @@ def get_us_travel_advisories():
         if len(cells) == 2:
             country = cells[0].text.strip()
             level = cells[1].text.strip()
-            alerts.append({"country": countyr, "threat_level": level})
-    
+            alerts.append({"country": country, "threat_level": level})
+
     df = pd.DataFrame(alerts)
-    df.to_csv("data/us_travel_advisories.csv", index=False)
+    df["threat_numeric"] = df["threat_level"].str.extract(r'(\d)').astype(int)
     return df

@@ -15,15 +15,21 @@ st.set_page_config(page_title="SafeTrip AI", layout="wide")
 st.title("🌍 SafeTrip AI - Your Real-Time Travel Safety Advisor")
 
 # Load and clean the advisory data
+from scraping.news_scraper import get_us_travel_advisories
+
+# Try to load existing data, or scrape live if not found
 DATA_PATH = "data/us_travel_advisories.csv"
 df = None
+
 try:
-    df = clean_threat_data(DATA_PATH)
-except FileNotFoundError:
-    st.error(f"❌ Data file not found at: {DATA_PATH}")
-    st.stop()
+    if os.path.exists(DATA_PATH):
+        df = clean_threat_data(DATA_PATH)
+    else:
+        df = get_us_travel_advisories()
+        os.makedirs("data", exist_ok=True)
+        df.to_csv(DATA_PATH, index=False)
 except Exception as e:
-    st.error(f"❌ Failed to load data: {str(e)}")
+    st.error(f"❌ Failed to load or scrape data: {str(e)}")
     st.stop()
 
 # Input from user
